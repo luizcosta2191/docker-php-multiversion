@@ -1,0 +1,53 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: dev_nginx
+    ports:
+      - "${NGINX_PORT}:80"
+      - "${NGINX_SSL_PORT}:443"
+    volumes:
+      - ./docker/nginx:/etc/nginx/conf.d
+      - ${PROJECTS_ROOT_PATH}:/var/www/html
+    depends_on:
+      - php56
+      - php70
+    networks:
+      - dev_network
+
+  php56:
+    build:
+      context: ./docker/php56
+    container_name: dev_php56
+    volumes:
+      - ${PROJECTS_ROOT_PATH}:/var/www/html
+    networks:
+      - dev_network
+
+  php70:
+    build:
+      context: ./docker/php70
+    container_name: dev_php70
+    volumes:
+      - ${PROJECTS_ROOT_PATH}:/var/www/html
+    networks:
+      - dev_network
+
+  redis:
+    image: redis:alpine
+    container_name: dev_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - dev_network
+
+  memcached:
+    image: memcached:alpine
+    container_name: dev_memcached
+    ports:
+      - "11211:11211"
+    networks:
+      - dev_network
+
+networks:
+  dev_network:
+    driver: bridge

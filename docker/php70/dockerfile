@@ -1,0 +1,29 @@
+FROM php:7.0-fpm
+
+RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' \
+           -e 's|security.debian.org/debian-security|archive.debian.org/debian-security|g' \
+           -e '/stretch-updates/d' /etc/apt/sources.list \
+    && echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/10-nocheckvalid
+
+# Updates packages and installs system dependencies.
+RUN apt-get update && apt-get install -y --allow-unauthenticated \
+    libmemcached-dev \
+    zlib1g-dev \
+    libssl-dev \
+    unzip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Installs native PHP extensions. (MySQL, PDO, Zip)
+RUN docker-php-ext-install pdo_mysql mysqli zip
+
+# Installs PECL extensions
+# Note: Redis is locked at version 5.3.7 and Memcached at 3.1.5 (the latest versions with stable support for PHP 7.0).
+RUN pecl install redis-5.3.7 \
+    && pecl install memcached-3.1.5 \
+    && docker-php-ext-enable redis memcached
+
+# Copy the custom PHP settings (You can use the same streamlined php.ini from version 5.6)
+COPY php.ini /usr/local/etc/php/conf.d/custom.ini
+
+WORKDIR /var/www/html

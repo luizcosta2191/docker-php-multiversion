@@ -1,0 +1,28 @@
+FROM php:5.6-fpm
+
+RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' \
+           -e 's|security.debian.org/debian-security|archive.debian.org/debian-security|g' \
+           -e '/stretch-updates/d' /etc/apt/sources.list \
+    && echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/10-nocheckvalid
+
+RUN apt-get update && apt-get install -y --allow-unauthenticated \
+    libmcrypt-dev \
+    libmemcached-dev \
+    zlib1g-dev \
+    libssl-dev \
+    unzip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Installs native PHP 5.6 extensions.
+RUN docker-php-ext-install pdo_mysql mysql mysqli mcrypt zip
+
+# Installs PECL extensions compatible with PHP 5.6.
+RUN pecl install redis-4.3.0 \
+    && pecl install memcached-2.2.0 \
+    && docker-php-ext-enable redis memcached
+
+# Copy the settings
+COPY php.ini /usr/local/etc/php/conf.d/custom.ini
+
+WORKDIR /var/www/html
