@@ -84,7 +84,7 @@ docker-php-multiversion/
 Clone the repository and create your environment variables file:
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/docker-php-multiversion.git
+git clone https://github.com/luizcosta2191/docker-php-multiversion.git
 cd docker-php-multiversion
 cp .env.example .env
 ```
