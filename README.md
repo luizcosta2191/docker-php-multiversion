@@ -120,3 +120,9 @@ Open your browser and navigate to:
 |---|---|
 | [http://app-legacy.test](http://app-legacy.test) | Routed to **PHP 5.6** |
 | [http://app-modern.test](http://app-modern.test) | Routed to **PHP 7.0** |
+
+---
+
+## 📄 License
+
+MIT — feel free to use, modify, and distribute.
